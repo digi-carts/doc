@@ -1,0 +1,450 @@
+window.DIGICARTS_GRAPH = {
+  "meta": {
+    "title": "digi-carts knowledge graph",
+    "org": "digi-carts",
+    "github": "https://github.com/digi-carts",
+    "updated": "2026-08-19",
+    "description": "Organization, repositories, runtime, data, actors, and how they connect."
+  },
+  "types": {
+    "org": { "label": "Organization", "color": "#c9a227" },
+    "actor": { "label": "Actor", "color": "#8ea2c8" },
+    "ui": { "label": "Frontend", "color": "#3d9b8f" },
+    "gateway": { "label": "Gateway", "color": "#d4654a" },
+    "service": { "label": "Java service", "color": "#5b8c5a" },
+    "schema": { "label": "Postgres schema", "color": "#7b6bb0" },
+    "data": { "label": "Data store", "color": "#3d5a80" },
+    "infra": { "label": "Infrastructure", "color": "#6b7280" },
+    "ci": { "label": "CI / Git", "color": "#9aa4b2" },
+    "external": { "label": "External system", "color": "#b45309" },
+    "concept": { "label": "Concept / gap", "color": "#a16207" },
+    "docs": { "label": "Documentation", "color": "#64748b" }
+  },
+  "nodes": [
+    {
+      "id": "org",
+      "label": "digi-carts",
+      "type": "org",
+      "group": "org",
+      "detail": "GitHub org and product: multi-tenant e-commerce SaaS (Java 21 / Spring Boot 3.3 / Next.js 16 / Cloud Run).",
+      "url": "https://github.com/digi-carts"
+    },
+    {
+      "id": "doc-repo",
+      "label": "doc",
+      "type": "docs",
+      "group": "docs",
+      "detail": "Platform design repo: architecture, API catalog, knowledge graph, GCP scripts, TODO.",
+      "url": "https://github.com/digi-carts/doc"
+    },
+    {
+      "id": "actor-shopper",
+      "label": "Shopper",
+      "type": "actor",
+      "group": "actors",
+      "detail": "Customer. Role claim user. Uses the storefront app."
+    },
+    {
+      "id": "actor-merchant",
+      "label": "Merchant",
+      "type": "actor",
+      "group": "actors",
+      "detail": "Store owner. Role claim merchant. Uses merchant-ui."
+    },
+    {
+      "id": "actor-admin",
+      "label": "Superadmin",
+      "type": "actor",
+      "group": "actors",
+      "detail": "Platform operator. Role claim superadmin. Uses platform-ui."
+    },
+    {
+      "id": "ui-storefront",
+      "label": "storefront",
+      "type": "ui",
+      "group": "frontends",
+      "port": "8080",
+      "stack": "Next.js 16.3 / React 19",
+      "detail": "Public shop, custom domains, client-side cart (Zustand). Rewrites /uploads/* to catalog.",
+      "url": "https://github.com/digi-carts/storefront"
+    },
+    {
+      "id": "ui-merchant",
+      "label": "merchant-ui",
+      "type": "ui",
+      "group": "frontends",
+      "port": "8080",
+      "stack": "Next.js 16.3",
+      "detail": "Store admin: catalog, orders, shipping, payments, bills, discounts.",
+      "url": "https://github.com/digi-carts/merchant-ui"
+    },
+    {
+      "id": "ui-platform",
+      "label": "platform-ui",
+      "type": "ui",
+      "group": "frontends",
+      "port": "8080",
+      "stack": "Next.js 16.3",
+      "detail": "SaaS admin: stores, subscriptions, notifications, tickets.",
+      "url": "https://github.com/digi-carts/platform-ui"
+    },
+    {
+      "id": "gw",
+      "label": "api-gateway",
+      "type": "gateway",
+      "group": "edge",
+      "port": 3000,
+      "stack": "Spring Cloud Gateway 2023.0.3, JJWT HS256",
+      "detail": "Edge: JWT filter, CORS, routes to 12 domain services. No StripPrefix. No database.",
+      "url": "https://github.com/digi-carts/api-gateway"
+    },
+    {
+      "id": "svc-auth",
+      "label": "auth-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3001,
+      "schema": "auth_svc",
+      "detail": "Users, addresses, password-reset tokens. Login/register/refresh controllers are not present yet; UIs still call /auth/refresh.",
+      "url": "https://github.com/digi-carts/auth-service"
+    },
+    {
+      "id": "svc-platform",
+      "label": "platform-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3002,
+      "schema": "platform_svc",
+      "detail": "Subscriptions, admin users, platform config, support tickets.",
+      "url": "https://github.com/digi-carts/platform-service"
+    },
+    {
+      "id": "svc-notification",
+      "label": "notification-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3003,
+      "schema": "notif_svc",
+      "detail": "SMTP email and WhatsApp (Meta/Twilio) config + notification logs.",
+      "url": "https://github.com/digi-carts/notification-service"
+    },
+    {
+      "id": "svc-catalog",
+      "label": "catalog-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3004,
+      "schema": "catalog_svc",
+      "detail": "Products, categories, stock. Requires x-store-id. May call platform-service on create.",
+      "url": "https://github.com/digi-carts/catalog-service"
+    },
+    {
+      "id": "svc-order",
+      "label": "order-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3005,
+      "schema": "order_svc",
+      "detail": "Orders, line items, returns. No server-side cart.",
+      "url": "https://github.com/digi-carts/order-service"
+    },
+    {
+      "id": "svc-payment",
+      "label": "payment-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3006,
+      "schema": "payment_svc",
+      "detail": "Razorpay orders, store/platform payment config, processed webhooks.",
+      "url": "https://github.com/digi-carts/payment-service"
+    },
+    {
+      "id": "svc-shipping",
+      "label": "shipping-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3007,
+      "schema": "shipping_svc",
+      "detail": "Shipments, return shipments, shipper/provider config, pincode fallback.",
+      "url": "https://github.com/digi-carts/shipping-service"
+    },
+    {
+      "id": "svc-store",
+      "label": "store-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3008,
+      "schema": "store_svc",
+      "detail": "Stores, domains, store pages. Liquibase owner of store_svc (should be sole writer).",
+      "url": "https://github.com/digi-carts/store-service"
+    },
+    {
+      "id": "svc-storefront",
+      "label": "storefront-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3009,
+      "schema": "store_svc",
+      "detail": "Read-oriented store resolution for public storefronts. Shares store_svc with store-service.",
+      "url": "https://github.com/digi-carts/storefront-service"
+    },
+    {
+      "id": "svc-offer",
+      "label": "offer-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3010,
+      "schema": "offer_svc",
+      "detail": "Discount codes / coupons. Controllers mapped under /api/offers.",
+      "url": "https://github.com/digi-carts/offer-service"
+    },
+    {
+      "id": "svc-billing",
+      "label": "billing-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3011,
+      "schema": "billing_svc",
+      "detail": "Bills, bill templates, invoice generation.",
+      "url": "https://github.com/digi-carts/billing-service"
+    },
+    {
+      "id": "svc-audit",
+      "label": "audit-log-service",
+      "type": "service",
+      "group": "backend",
+      "port": 3012,
+      "schema": "audit_log_svc",
+      "detail": "Audit rows and settings. Not auto-emitted from the gateway today.",
+      "url": "https://github.com/digi-carts/audit-log-service"
+    },
+    {
+      "id": "pg",
+      "label": "PostgreSQL",
+      "type": "data",
+      "group": "data",
+      "detail": "Shared Cloud SQL instance. One schema per bounded context. Hibernate ddl-auto=validate; Liquibase owns DDL."
+    },
+    { "id": "sch-auth", "label": "auth_svc", "type": "schema", "group": "data", "detail": "users, addresses, password_reset_tokens" },
+    { "id": "sch-platform", "label": "platform_svc", "type": "schema", "group": "data", "detail": "subscriptions, admin_users, platform_config, support_tickets" },
+    { "id": "sch-notif", "label": "notif_svc", "type": "schema", "group": "data", "detail": "notification_config, notification_logs" },
+    { "id": "sch-catalog", "label": "catalog_svc", "type": "schema", "group": "data", "detail": "product, category" },
+    { "id": "sch-order", "label": "order_svc", "type": "schema", "group": "data", "detail": "orders, order_items, returns, return_items" },
+    { "id": "sch-payment", "label": "payment_svc", "type": "schema", "group": "data", "detail": "payment_order, payment configs, processed_webhooks" },
+    { "id": "sch-shipping", "label": "shipping_svc", "type": "schema", "group": "data", "detail": "shipment, return_shipment, shipper/provider config" },
+    { "id": "sch-store", "label": "store_svc", "type": "schema", "group": "data", "detail": "stores, store_pages — shared by store-service and storefront-service" },
+    { "id": "sch-offer", "label": "offer_svc", "type": "schema", "group": "data", "detail": "offers" },
+    { "id": "sch-billing", "label": "billing_svc", "type": "schema", "group": "data", "detail": "bills, bill_templates" },
+    { "id": "sch-audit", "label": "audit_log_svc", "type": "schema", "group": "data", "detail": "audit_log, audit_settings" },
+    {
+      "id": "jwt",
+      "label": "JWT_SECRET",
+      "type": "concept",
+      "group": "security",
+      "detail": "HMAC-SHA256 shared by api-gateway and (intended) auth-service. Gateway injects X-User-Id and X-User-Role."
+    },
+    {
+      "id": "tenant",
+      "label": "Store tenant",
+      "type": "concept",
+      "group": "security",
+      "detail": "store_id is the tenancy key on products, orders, offers, payments, shipments, bills, merchants, audit."
+    },
+    {
+      "id": "cart",
+      "label": "Client cart",
+      "type": "concept",
+      "group": "security",
+      "detail": "Cart is Zustand in the storefront. Gateway /api/cart/** has no cart controller. No saga orchestrator."
+    },
+    {
+      "id": "gap-paths",
+      "label": "Path mismatch",
+      "type": "concept",
+      "group": "security",
+      "detail": "Gateway predicates are /api/...; many controllers are unprefixed (/users, /orders). No StripPrefix."
+    },
+    {
+      "id": "gcp-dev",
+      "label": "digi-carts-dev",
+      "type": "infra",
+      "group": "gcp",
+      "detail": "GCP project for Cloud Run dev. Push to branch stage deploys here."
+    },
+    {
+      "id": "gcp-prod",
+      "label": "digi-carts",
+      "type": "infra",
+      "group": "gcp",
+      "detail": "GCP project for Cloud Run prod. Merge to main tags semver and deploys."
+    },
+    {
+      "id": "cloudrun",
+      "label": "Cloud Run",
+      "type": "infra",
+      "group": "gcp",
+      "detail": "Region us-east1. Service names digi-cart-{repo}-dev / digi-cart-{repo}."
+    },
+    {
+      "id": "ar",
+      "label": "Artifact Registry",
+      "type": "infra",
+      "group": "gcp",
+      "detail": "us-east1-docker.pkg.dev/{project}/digi-cart/"
+    },
+    {
+      "id": "cloudsql",
+      "label": "Cloud SQL",
+      "type": "infra",
+      "group": "gcp",
+      "detail": "PostgreSQL with Cloud SQL socket factory from Cloud Run."
+    },
+    {
+      "id": "gha",
+      "label": "GitHub Actions",
+      "type": "ci",
+      "group": "git",
+      "detail": "deploy-dev.yml on stage, deploy-prod.yml on main, pr-tests.yml on PRs to stage/main."
+    },
+    {
+      "id": "branch-stage",
+      "label": "stage",
+      "type": "ci",
+      "group": "git",
+      "detail": "Default app branch. Push deploys to Cloud Run dev."
+    },
+    {
+      "id": "branch-main",
+      "label": "main",
+      "type": "ci",
+      "group": "git",
+      "detail": "Production. Auto-increment git tag + GitHub Release + Cloud Run prod."
+    },
+    {
+      "id": "ext-razorpay",
+      "label": "Razorpay",
+      "type": "external",
+      "group": "external",
+      "detail": "Online payments via payment-service."
+    },
+    {
+      "id": "ext-ship",
+      "label": "Shiprocket / Delhivery",
+      "type": "external",
+      "group": "external",
+      "detail": "Shipping providers configured in shipping-service."
+    },
+    {
+      "id": "ext-smtp",
+      "label": "SMTP",
+      "type": "external",
+      "group": "external",
+      "detail": "Merchant/platform email via notification-service."
+    },
+    {
+      "id": "ext-wa",
+      "label": "WhatsApp",
+      "type": "external",
+      "group": "external",
+      "detail": "Meta or Twilio WhatsApp via notification-service."
+    }
+  ],
+  "edges": [
+    { "source": "org", "target": "doc-repo", "rel": "contains", "label": "docs" },
+    { "source": "org", "target": "ui-storefront", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "ui-merchant", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "ui-platform", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "gw", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-auth", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-platform", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-notification", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-catalog", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-order", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-payment", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-shipping", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-store", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-storefront", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-offer", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-billing", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "svc-audit", "rel": "contains", "label": "repo" },
+    { "source": "org", "target": "gha", "rel": "uses", "label": "CI" },
+    { "source": "org", "target": "gcp-dev", "rel": "deploys", "label": "dev project" },
+    { "source": "org", "target": "gcp-prod", "rel": "deploys", "label": "prod project" },
+
+    { "source": "actor-shopper", "target": "ui-storefront", "rel": "uses", "label": "HTTPS" },
+    { "source": "actor-merchant", "target": "ui-merchant", "rel": "uses", "label": "HTTPS" },
+    { "source": "actor-admin", "target": "ui-platform", "rel": "uses", "label": "HTTPS" },
+
+    { "source": "ui-storefront", "target": "gw", "rel": "calls", "label": "REST + JWT" },
+    { "source": "ui-merchant", "target": "gw", "rel": "calls", "label": "REST + JWT" },
+    { "source": "ui-platform", "target": "gw", "rel": "calls", "label": "REST + JWT" },
+    { "source": "ui-storefront", "target": "cart", "rel": "owns", "label": "Zustand cart" },
+    { "source": "ui-storefront", "target": "svc-catalog", "rel": "calls", "label": "/uploads rewrite" },
+
+    { "source": "gw", "target": "jwt", "rel": "validates", "label": "HS256" },
+    { "source": "svc-auth", "target": "jwt", "rel": "should-sign", "label": "intended issuer" },
+    { "source": "gw", "target": "gap-paths", "rel": "has", "label": "no StripPrefix" },
+
+    { "source": "gw", "target": "svc-auth", "rel": "routes", "label": "/api/auth, /api/address" },
+    { "source": "gw", "target": "svc-platform", "rel": "routes", "label": "/api/platform, subscriptions, admin, support" },
+    { "source": "gw", "target": "svc-notification", "rel": "routes", "label": "/api/notifications" },
+    { "source": "gw", "target": "svc-catalog", "rel": "routes", "label": "/api/products, categories, catalog, upload" },
+    { "source": "gw", "target": "svc-order", "rel": "routes", "label": "/api/orders, cart, returns" },
+    { "source": "gw", "target": "svc-payment", "rel": "routes", "label": "/api/payments, webhooks" },
+    { "source": "gw", "target": "svc-shipping", "rel": "routes", "label": "/api/shipping" },
+    { "source": "gw", "target": "svc-store", "rel": "routes", "label": "/api/stores, domain, pages" },
+    { "source": "gw", "target": "svc-storefront", "rel": "routes", "label": "/api/storefront (public)" },
+    { "source": "gw", "target": "svc-offer", "rel": "routes", "label": "/api/offers" },
+    { "source": "gw", "target": "svc-billing", "rel": "routes", "label": "/api/billing, bills" },
+    { "source": "gw", "target": "svc-audit", "rel": "routes", "label": "/api/audit" },
+
+    { "source": "svc-auth", "target": "sch-auth", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-platform", "target": "sch-platform", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-notification", "target": "sch-notif", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-catalog", "target": "sch-catalog", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-order", "target": "sch-order", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-payment", "target": "sch-payment", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-shipping", "target": "sch-shipping", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-store", "target": "sch-store", "rel": "owns", "label": "Liquibase writer" },
+    { "source": "svc-storefront", "target": "sch-store", "rel": "reads", "label": "shared schema" },
+    { "source": "svc-offer", "target": "sch-offer", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-billing", "target": "sch-billing", "rel": "owns", "label": "Liquibase" },
+    { "source": "svc-audit", "target": "sch-audit", "rel": "owns", "label": "Liquibase" },
+
+    { "source": "sch-auth", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-platform", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-notif", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-catalog", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-order", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-payment", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-shipping", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-store", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-offer", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-billing", "target": "pg", "rel": "in", "label": "schema" },
+    { "source": "sch-audit", "target": "pg", "rel": "in", "label": "schema" },
+
+    { "source": "pg", "target": "cloudsql", "rel": "hosted", "label": "Cloud SQL" },
+    { "source": "cloudsql", "target": "gcp-dev", "rel": "in", "label": "dev" },
+    { "source": "cloudsql", "target": "gcp-prod", "rel": "in", "label": "prod" },
+    { "source": "cloudrun", "target": "gcp-dev", "rel": "in", "label": "*-dev" },
+    { "source": "cloudrun", "target": "gcp-prod", "rel": "in", "label": "prod" },
+    { "source": "ar", "target": "gcp-dev", "rel": "in", "label": "images" },
+    { "source": "ar", "target": "gcp-prod", "rel": "in", "label": "images" },
+    { "source": "gha", "target": "branch-stage", "rel": "on", "label": "deploy-dev + tests" },
+    { "source": "gha", "target": "branch-main", "rel": "on", "label": "release + deploy-prod" },
+    { "source": "branch-stage", "target": "cloudrun", "rel": "deploys", "label": "dev" },
+    { "source": "branch-main", "target": "cloudrun", "rel": "deploys", "label": "prod" },
+    { "source": "gha", "target": "ar", "rel": "pushes", "label": "docker" },
+
+    { "source": "svc-payment", "target": "ext-razorpay", "rel": "integrates", "label": "orders/webhooks" },
+    { "source": "svc-shipping", "target": "ext-ship", "rel": "integrates", "label": "labels/track" },
+    { "source": "svc-notification", "target": "ext-smtp", "rel": "integrates", "label": "email" },
+    { "source": "svc-notification", "target": "ext-wa", "rel": "integrates", "label": "WhatsApp" },
+    { "source": "svc-catalog", "target": "svc-platform", "rel": "calls", "label": "product-limit check" },
+
+    { "source": "tenant", "target": "svc-store", "rel": "defined-by", "label": "Store aggregate" },
+    { "source": "tenant", "target": "svc-catalog", "rel": "scopes", "label": "x-store-id" },
+    { "source": "tenant", "target": "svc-order", "rel": "scopes", "label": "store_id" },
+    { "source": "doc-repo", "target": "gw", "rel": "documents", "label": "architecture" }
+  ]
+};

@@ -58,6 +58,7 @@
 - [x] `scripts/setup-cloud-run.sh` — creates all 32 Cloud Run services (16 dev + 16 prod)
 - [x] Per-repo `doc/README.md` on all 16 app repos (PRs to `stage`)
 - [x] Platform architecture pack: `architecture/system-design.md`, `sequence-diagrams.md`, `c4-containers.md`, `data-model.md`, `service-catalog.md`
+- [x] Interactive knowledge graph (`knowledge-graph/`) covering org, repos, routes, schemas, GCP, CI
 
 ### JavaDoc, health checks, tests
 - [x] JavaDoc on all classes and public methods (`package-info.java`, javadoc plugin) on all 13 Java services

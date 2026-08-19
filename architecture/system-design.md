@@ -233,5 +233,6 @@ Documented from current source, not a roadmap commitment:
 | [architecture/c4-containers.md](c4-containers.md) | C4 container sketch |
 | [architecture/data-model.md](data-model.md) | Cross-service ER |
 | [architecture/service-catalog.md](service-catalog.md) | Link index to every `doc/README.md` |
+| [knowledge-graph/](../knowledge-graph/index.html) | Interactive org/project graph |
 | [README.md](../README.md) | Ops overview (ports, CI secrets, local run) |
 | [TODO.md](../TODO.md) | Migration checklist |

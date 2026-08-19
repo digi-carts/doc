@@ -2,6 +2,11 @@
 
 All notable changes to the **doc** (platform design) repository are documented in this file.
 
+## [0.4.0] - 2026-08-19
+
+### Added
+- Interactive org knowledge graph under `knowledge-graph/` (`graph.json`, `graph-data.js`, `graph.js`, `index.html`)
+
 ## [0.3.0] - 2026-08-19
 
 ### Added
