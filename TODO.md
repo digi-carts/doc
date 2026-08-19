@@ -56,6 +56,17 @@
 - [x] `TODO.md` — this file
 - [x] `scripts/setup-artifact-registry.sh` — GCP Artifact Registry + service account + IAM setup script
 - [x] `scripts/setup-cloud-run.sh` — creates all 32 Cloud Run services (16 dev + 16 prod)
+- [x] Per-repo `doc/README.md` on all 16 app repos (PRs to `stage`)
+- [x] Platform architecture pack: `architecture/system-design.md`, `sequence-diagrams.md`, `c4-containers.md`, `data-model.md`, `service-catalog.md`
+
+### JavaDoc, health checks, tests
+- [x] JavaDoc (+ `package-info.java`, javadoc plugin) on all 13 Java services
+- [x] Liveness endpoints `GET /health` and `GET /api/health` on all 12 domain services and `api-gateway` (JWT public paths include both)
+- [x] JUnit 5 unit tests + Cucumber component suites on all Java services (Cucumber excluded from Surefire JaCoCo gate)
+- [x] Cucumber JS component tests on `merchant-ui`, `platform-ui`, `storefront` (`npm run test:component`)
+- [x] JaCoCo **line + branch COVEREDRATIO 1.00** enforced on `mvn test` for all 13 Java services
+- [x] GitHub Actions **PR tests** (`pr-tests.yml`): `pull_request` to `stage`/`main` runs `mvn -B test` (Java) or `npm run test:component` (UIs); deploy-dev waits on the same test job
+- [ ] Require the `PR tests / test` status check in branch protection (GitHub Team)
 
 ---
 
@@ -159,7 +170,8 @@
 - [ ] Create default store template entries
 
 ### Post-Migration Verification
-- [ ] Run health checks on all 13 backend services: `GET /health`
+- [x] Health endpoints implemented on all 13 Java backends (`GET /health`, `GET /api/health`) — **deployed** Cloud Run smoke still pending
+- [ ] Hit live Cloud Run `/health` on all 13 backends after first deploy
 - [ ] Verify Liquibase runs successfully (all schemas and tables created)
 - [ ] Test auth flow: register → login → JWT → api-gateway proxy
 - [ ] Test catalog CRUD via api-gateway
@@ -178,6 +190,11 @@
 | Frontend repos | 3 / 3 | 0 |
 | CI/CD workflows | 16 / 16 | 0 |
 | Branch setup | 16 / 16 | 0 |
+| Per-repo + platform docs | 17 / 17 | 0 |
+| JavaDoc (Java services) | 13 / 13 | 0 |
+| Health endpoints in code | 13 / 13 | live Cloud Run smoke |
+| JUnit + JaCoCo 100% | 13 / 13 | 0 |
+| UI Cucumber component tests | 3 / 3 | 0 |
 | Branch protection | 0 / 16 | 16 (needs GitHub Pro) |
 | GCP Artifact Registry | 1 / 2 (script ready) | run script |
 | Cloud Run services | 0 / 32 (script ready) | run script |
