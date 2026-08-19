@@ -55,9 +55,9 @@ service_port() {
     offer-service)     echo 3010 ;;
     billing-service)   echo 3011 ;;
     audit-log-service) echo 3012 ;;
-    merchant-ui)       echo 3000 ;;
-    platform-ui)       echo 3000 ;;
-    storefront)        echo 3000 ;;
+    merchant-ui)       echo 8080 ;;
+    platform-ui)       echo 8080 ;;
+    storefront)        echo 8080 ;;
     *)                 echo 8080 ;;
   esac
 }
