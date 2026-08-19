@@ -122,13 +122,17 @@ grant_cloud_run_access() {
     --quiet
   echo "  ✓ Granted roles/cloudsql.client to $SA"
 
-  # Also grant to the github-actions SA so it can connect for migrations
+  # Also grant to the github-actions SA (created by setup-artifact-registry.sh)
   local GH_SA="github-actions-sa@${PROJECT}.iam.gserviceaccount.com"
-  gcloud projects add-iam-policy-binding "$PROJECT" \
-    --member="serviceAccount:${GH_SA}" \
-    --role="roles/cloudsql.client" \
-    --quiet
-  echo "  ✓ Granted roles/cloudsql.client to $GH_SA"
+  if gcloud iam service-accounts describe "$GH_SA" --project="$PROJECT" &>/dev/null 2>&1; then
+    gcloud projects add-iam-policy-binding "$PROJECT" \
+      --member="serviceAccount:${GH_SA}" \
+      --role="roles/cloudsql.client" \
+      --quiet
+    echo "  ✓ Granted roles/cloudsql.client to $GH_SA"
+  else
+    echo "  SKIP: $GH_SA not found — run setup-artifact-registry.sh first, then re-run this script"
+  fi
 }
 
 print_connection_string() {
