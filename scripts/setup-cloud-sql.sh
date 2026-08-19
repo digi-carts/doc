@@ -57,8 +57,6 @@ create_instance() {
     --storage-type=SSD \
     --storage-size=10GB \
     --storage-auto-increase \
-    --no-assign-ip \
-    --enable-google-private-path \
     --project="$PROJECT" \
     --quiet
   echo "  ✓ Instance '$INSTANCE' created"
