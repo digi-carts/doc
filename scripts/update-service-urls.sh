@@ -124,15 +124,19 @@ update_env() {
 
   gcloud config set project "$PROJECT" --quiet
 
-  # Fetch all URLs upfront
+  # Fetch all URLs into a temp file: "service-name URL"
+  local URL_FILE
+  URL_FILE=$(mktemp)
   echo "→ Fetching service URLs..."
-  declare -A URLS
   for SVC in api-gateway "${BACKEND_SERVICES[@]}" "${FRONTEND_SERVICES[@]}"; do
     NAME="digi-cart-${SVC}${SUFFIX}"
     URL=$(get_url "$PROJECT" "$NAME")
-    URLS[$SVC]="$URL"
+    echo "${SVC} ${URL}" >> "$URL_FILE"
     echo "  $NAME → ${URL:-NOT FOUND}"
   done
+
+  # Helper: look up a URL from the temp file
+  svc_url() { grep "^$1 " "$URL_FILE" | awk '{print $2}'; }
 
   # Get Cloud SQL connection name
   local CONN_NAME
@@ -146,7 +150,7 @@ update_env() {
   for ROUTE in "${GATEWAY_ROUTES[@]}"; do
     local KEY
     KEY=$(echo "${ROUTE}" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
-    GW_VARS="${GW_VARS},${KEY}_URL=${URLS[$ROUTE]}"
+    GW_VARS="${GW_VARS},${KEY}_URL=$(svc_url "$ROUTE")"
   done
   gcloud run services update "digi-cart-api-gateway${SUFFIX}" \
     --region="$REGION" --project="$PROJECT" \
@@ -178,10 +182,12 @@ update_env() {
   done
 
   # ── frontends: NEXT_PUBLIC_API_URL ────────────────────────────────────────
-  local GW_URL="${URLS[api-gateway]}"
+  local GW_URL
+  GW_URL=$(svc_url "api-gateway")
   for SVC in "${FRONTEND_SERVICES[@]}"; do
     echo "→ Updating ${SVC}..."
-    local SVC_URL="${URLS[$SVC]}"
+    local SVC_URL
+    SVC_URL=$(svc_url "$SVC")
     gcloud run services update "digi-cart-${SVC}${SUFFIX}" \
       --region="$REGION" --project="$PROJECT" \
       --set-env-vars="NEXT_PUBLIC_API_URL=${GW_URL},NEXTAUTH_SECRET=${JWT_SECRET},NEXTAUTH_URL=${SVC_URL}" \
@@ -189,6 +195,7 @@ update_env() {
     echo "  ✓ ${SVC} updated"
   done
 
+  rm -f "$URL_FILE"
   echo ""
   echo "  ✅ $ENV env vars updated"
 }
