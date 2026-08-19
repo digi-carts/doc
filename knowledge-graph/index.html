@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>digi-carts knowledge graph</title>
+  <style>
+    :root {
+      --bg: #12141a;
+      --panel: #1a1d26;
+      --line: #2a2f3a;
+      --text: #e8eaed;
+      --muted: #9aa3b2;
+      --accent: #c9a227;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+    header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel);
+    }
+    header h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: 0.02em; }
+    header p { margin: 0; color: var(--muted); flex: 1; }
+    header input {
+      width: 220px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+      padding: 6px 10px; border-radius: 4px;
+    }
+    header button {
+      background: transparent; border: 1px solid var(--line); color: var(--text);
+      padding: 6px 10px; border-radius: 4px; cursor: pointer;
+    }
+    header button:hover { border-color: var(--accent); color: var(--accent); }
+    .layout { display: grid; grid-template-columns: 220px 1fr 280px; height: calc(100% - 49px); }
+    aside, .inspector { background: var(--panel); border-color: var(--line); overflow: auto; padding: 12px 14px; }
+    aside { border-right: 1px solid var(--line); }
+    .inspector { border-left: 1px solid var(--line); }
+    h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 10px; }
+    label.filter { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
+    label.filter span.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    canvas { display: block; width: 100%; height: 100%; background: #0e1015; cursor: grab; }
+    canvas.dragging { cursor: grabbing; }
+    .inspector h3 { margin: 0 0 6px; font-size: 16px; }
+    .inspector .type { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .inspector dl { margin: 0; }
+    .inspector dt { color: var(--muted); font-size: 11px; margin-top: 10px; }
+    .inspector dd { margin: 2px 0 0; }
+    .inspector a { color: #8eb4ff; }
+    .hint { color: var(--muted); font-size: 12px; }
+    .stats { margin-top: 16px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>digi-carts knowledge graph</h1>
+    <p>Drag nodes · scroll to zoom · click for details · double-click opens GitHub</p>
+    <input id="search" type="search" placeholder="Search nodes…" autocomplete="off" />
+    <button type="button" id="reset">Reset view</button>
+  </header>
+  <div class="layout">
+    <aside>
+      <h2>Show types</h2>
+      <div id="filters"></div>
+      <p class="stats" id="stats"></p>
+    </aside>
+    <canvas id="graph"></canvas>
+    <div class="inspector" id="inspector">
+      <h2>Inspector</h2>
+      <p class="hint">Select a node or edge. Data lives in <code>graph.json</code> (also loaded as <code>graph-data.js</code> so this page works from disk).</p>
+    </div>
+  </div>
+  <script src="graph-data.js"></script>
+  <script src="graph.js"></script>
+</body>
+</html>

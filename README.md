@@ -11,6 +11,8 @@ Complete system design lives under [`architecture/`](architecture/):
 - [Data model](architecture/data-model.md)
 - [C4 containers](architecture/c4-containers.md)
 - [Service catalog](architecture/service-catalog.md) — links to every project's `doc/README.md`
+- [HTTP API catalog](api/README.md) — every controller route, by service
+- [Knowledge graph](knowledge-graph/index.html) — interactive org/project map (`graph.json` + JS)
 
 Per-service and per-UI documentation is maintained in each GitHub repo at **`doc/README.md`**.
 
