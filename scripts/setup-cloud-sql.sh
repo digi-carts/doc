@@ -111,8 +111,11 @@ grant_cloud_run_access() {
   local PROJECT=$1
   local INSTANCE=$2
 
+  local PROJECT_NUMBER
+  PROJECT_NUMBER=$(gcloud projects describe "$PROJECT" --format="value(projectNumber)")
+
   echo "→ Granting Cloud SQL Client role to compute service account..."
-  local SA="${PROJECT}-compute@developer.gserviceaccount.com"
+  local SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
   gcloud projects add-iam-policy-binding "$PROJECT" \
     --member="serviceAccount:${SA}" \
     --role="roles/cloudsql.client" \
