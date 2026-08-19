@@ -195,6 +195,8 @@
 | Health endpoints in code | 13 / 13 | live Cloud Run smoke |
 | JUnit + JaCoCo 100% | 13 / 13 | 0 |
 | UI Cucumber component tests | 3 / 3 | 0 |
+| PR test workflow | 16 / 16 | require status check |
+| PR test workflow | 16 / 16 | require status check |
 | Branch protection | 0 / 16 | 16 (needs GitHub Pro) |
 | GCP Artifact Registry | 1 / 2 (script ready) | run script |
 | Cloud Run services | 0 / 32 (script ready) | run script |
