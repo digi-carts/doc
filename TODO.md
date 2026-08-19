@@ -55,6 +55,7 @@
 - [x] `README.md` — full platform overview, architecture, repo table, CI/CD, GCP setup, local dev guide
 - [x] `TODO.md` — this file
 - [x] `scripts/setup-artifact-registry.sh` — GCP Artifact Registry + service account + IAM setup script
+- [x] `scripts/setup-cloud-run.sh` — creates all 32 Cloud Run services (16 dev + 16 prod)
 
 ---
 
@@ -72,15 +73,19 @@
 
 - [x] Artifact Registry setup script ready → run `doc/scripts/setup-artifact-registry.sh`
 - [ ] **Run** `setup-artifact-registry.sh` (creates `digi-cart` repo, service account, IAM roles, downloads SA key)
-- [ ] Create Cloud Run services (16):
-  `digi-cart-api-gateway-dev`, `digi-cart-auth-service-dev`, `digi-cart-platform-service-dev`, `digi-cart-notification-service-dev`, `digi-cart-catalog-service-dev`, `digi-cart-order-service-dev`, `digi-cart-payment-service-dev`, `digi-cart-shipping-service-dev`, `digi-cart-store-service-dev`, `digi-cart-storefront-service-dev`, `digi-cart-offer-service-dev`, `digi-cart-billing-service-dev`, `digi-cart-audit-log-service-dev`, `digi-cart-merchant-ui-dev`, `digi-cart-platform-ui-dev`, `digi-cart-storefront-dev`
+- [x] Cloud Run setup script ready → run `doc/scripts/setup-cloud-run.sh`
+- [ ] **Run** `setup-cloud-run.sh` (creates all 16 dev services with placeholder image)
 - [ ] Provision PostgreSQL (Cloud SQL) for dev
-- [ ] Create GCP service account, grant Artifact Registry Writer + Cloud Run Developer roles
-- [ ] Configure IAM for Cloud Run service-to-service calls
+- [ ] Update `DATABASE_URL` env var on all 12 backend services
+- [ ] Update `JWT_SECRET` on `api-gateway` + `auth-service`
+- [ ] Update `*_SERVICE_URL` env vars on `api-gateway` with real Cloud Run URLs
 
 ### GCP Infrastructure — Prod (`digi-carts`)
-- [ ] Same as dev above (without `-dev` suffix on service names)
+
+- [x] Cloud Run setup script ready → run `doc/scripts/setup-cloud-run.sh` (handles both dev + prod)
+- [ ] **Run** `setup-cloud-run.sh` (creates all 16 prod services with placeholder image)
 - [ ] Provision PostgreSQL (Cloud SQL) for prod — high availability recommended
+- [ ] Update `DATABASE_URL`, `JWT_SECRET`, `*_SERVICE_URL` env vars on all services
 - [ ] Set up Cloud Armor / Load Balancer for custom domain `digi-carts.com`
 
 ### Environment Variables per Cloud Run Service
@@ -175,7 +180,7 @@
 | Branch setup | 16 / 16 | 0 |
 | Branch protection | 0 / 16 | 16 (needs GitHub Pro) |
 | GCP Artifact Registry | 1 / 2 (script ready) | run script |
-| Cloud Run services | 0 / 32 | 32 |
+| Cloud Run services | 0 / 32 (script ready) | run script |
 | PostgreSQL provisioned | 0 / 2 | 2 |
 | GitHub org secrets | 0 / 2 | 2 |
 | Env vars configured | 0 / 16 | 16 |
