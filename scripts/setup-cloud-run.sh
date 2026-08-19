@@ -85,16 +85,17 @@ create_service() {
   is_public "$SVC" && AUTH_FLAG="--allow-unauthenticated"
 
   # Base env vars (placeholders — update after provisioning DB/secrets)
-  local ENV_VARS="PORT=${PORT}"
+  # Note: PORT is set automatically by Cloud Run — do not include it here
+  local -a ENV_PARTS=()
   if [[ "$DB_SCHEMA" != "none" ]]; then
     if [ "$ENV" = "dev" ]; then
-      ENV_VARS="${ENV_VARS},DATABASE_URL=jdbc:postgresql://REPLACE_DB_HOST/digicarts_dev?currentSchema=${DB_SCHEMA}"
+      ENV_PARTS+=("DATABASE_URL=jdbc:postgresql://REPLACE_DB_HOST/digicarts_dev?currentSchema=${DB_SCHEMA}")
     else
-      ENV_VARS="${ENV_VARS},DATABASE_URL=jdbc:postgresql://REPLACE_DB_HOST/digicarts?currentSchema=${DB_SCHEMA}"
+      ENV_PARTS+=("DATABASE_URL=jdbc:postgresql://REPLACE_DB_HOST/digicarts?currentSchema=${DB_SCHEMA}")
     fi
   fi
   if [[ "$SVC" == "api-gateway" || "$SVC" == "auth-service" ]]; then
-    ENV_VARS="${ENV_VARS},JWT_SECRET=REPLACE_JWT_SECRET"
+    ENV_PARTS+=("JWT_SECRET=REPLACE_JWT_SECRET")
   fi
   if [[ "$SVC" == "api-gateway" ]]; then
     local BASE_URL
@@ -103,30 +104,37 @@ create_service() {
     else
       BASE_URL="https://digi-cart-SVC-REPLACE.a.run.app"
     fi
-    ENV_VARS="${ENV_VARS},AUTH_SERVICE_URL=${BASE_URL/SVC/auth-service}"
-    ENV_VARS="${ENV_VARS},CATALOG_SERVICE_URL=${BASE_URL/SVC/catalog-service}"
-    ENV_VARS="${ENV_VARS},ORDER_SERVICE_URL=${BASE_URL/SVC/order-service}"
-    ENV_VARS="${ENV_VARS},PAYMENT_SERVICE_URL=${BASE_URL/SVC/payment-service}"
-    ENV_VARS="${ENV_VARS},PLATFORM_SERVICE_URL=${BASE_URL/SVC/platform-service}"
-    ENV_VARS="${ENV_VARS},NOTIFICATION_SERVICE_URL=${BASE_URL/SVC/notification-service}"
-    ENV_VARS="${ENV_VARS},SHIPPING_SERVICE_URL=${BASE_URL/SVC/shipping-service}"
-    ENV_VARS="${ENV_VARS},STORE_SERVICE_URL=${BASE_URL/SVC/store-service}"
-    ENV_VARS="${ENV_VARS},STOREFRONT_SERVICE_URL=${BASE_URL/SVC/storefront-service}"
-    ENV_VARS="${ENV_VARS},OFFER_SERVICE_URL=${BASE_URL/SVC/offer-service}"
-    ENV_VARS="${ENV_VARS},BILLING_SERVICE_URL=${BASE_URL/SVC/billing-service}"
-    ENV_VARS="${ENV_VARS},AUDIT_LOG_SERVICE_URL=${BASE_URL/SVC/audit-log-service}"
+    ENV_PARTS+=("AUTH_SERVICE_URL=${BASE_URL/SVC/auth-service}")
+    ENV_PARTS+=("CATALOG_SERVICE_URL=${BASE_URL/SVC/catalog-service}")
+    ENV_PARTS+=("ORDER_SERVICE_URL=${BASE_URL/SVC/order-service}")
+    ENV_PARTS+=("PAYMENT_SERVICE_URL=${BASE_URL/SVC/payment-service}")
+    ENV_PARTS+=("PLATFORM_SERVICE_URL=${BASE_URL/SVC/platform-service}")
+    ENV_PARTS+=("NOTIFICATION_SERVICE_URL=${BASE_URL/SVC/notification-service}")
+    ENV_PARTS+=("SHIPPING_SERVICE_URL=${BASE_URL/SVC/shipping-service}")
+    ENV_PARTS+=("STORE_SERVICE_URL=${BASE_URL/SVC/store-service}")
+    ENV_PARTS+=("STOREFRONT_SERVICE_URL=${BASE_URL/SVC/storefront-service}")
+    ENV_PARTS+=("OFFER_SERVICE_URL=${BASE_URL/SVC/offer-service}")
+    ENV_PARTS+=("BILLING_SERVICE_URL=${BASE_URL/SVC/billing-service}")
+    ENV_PARTS+=("AUDIT_LOG_SERVICE_URL=${BASE_URL/SVC/audit-log-service}")
   fi
   if [[ "$SVC" == "merchant-ui" || "$SVC" == "platform-ui" || "$SVC" == "storefront" ]]; then
     if [ "$ENV" = "dev" ]; then
-      ENV_VARS="${ENV_VARS},NEXT_PUBLIC_API_URL=https://digi-cart-api-gateway-dev-REPLACE.a.run.app"
+      ENV_PARTS+=("NEXT_PUBLIC_API_URL=https://digi-cart-api-gateway-dev-REPLACE.a.run.app")
     else
-      ENV_VARS="${ENV_VARS},NEXT_PUBLIC_API_URL=https://digi-cart-api-gateway-REPLACE.a.run.app"
+      ENV_PARTS+=("NEXT_PUBLIC_API_URL=https://digi-cart-api-gateway-REPLACE.a.run.app")
     fi
-    ENV_VARS="${ENV_VARS},NEXTAUTH_SECRET=REPLACE_NEXTAUTH_SECRET"
-    ENV_VARS="${ENV_VARS},NEXTAUTH_URL=https://REPLACE.a.run.app"
+    ENV_PARTS+=("NEXTAUTH_SECRET=REPLACE_NEXTAUTH_SECRET")
+    ENV_PARTS+=("NEXTAUTH_URL=https://REPLACE.a.run.app")
   fi
 
+  local ENV_VARS
+  ENV_VARS=$(IFS=','; echo "${ENV_PARTS[*]}")
+
   echo "  → $NAME ($MEMORY, port $PORT)"
+
+  local SET_ENV_FLAG=()
+  [ -n "$ENV_VARS" ] && SET_ENV_FLAG=("--set-env-vars=$ENV_VARS")
+
   gcloud run deploy "$NAME" \
     --image="$PLACEHOLDER" \
     --region="$REGION" \
@@ -136,7 +144,7 @@ create_service() {
     --cpu=1 \
     --min-instances=0 \
     --max-instances=3 \
-    --set-env-vars="$ENV_VARS" \
+    "${SET_ENV_FLAG[@]}" \
     $AUTH_FLAG \
     --quiet
 }

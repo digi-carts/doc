@@ -116,10 +116,11 @@ create_registry() {
   echo "  ⚠️  Add this file's contents as a GitHub secret:"
   if [ "$ENV" = "dev" ]; then
     echo "     Secret name : GCP_DEV_SA_KEY"
+    echo "     Command     : gh secret set GCP_DEV_SA_KEY \\"
   else
     echo "     Secret name : GCP_SA_KEY"
+    echo "     Command     : gh secret set GCP_SA_KEY \\"
   fi
-  echo "     Command     : gh secret set ${ENV == 'dev' && 'GCP_DEV_SA_KEY' || 'GCP_SA_KEY'} \\"
   echo "                     --org digi-carts \\"
   echo "                     --visibility all \\"
   echo "                     < $KEY_FILE"
