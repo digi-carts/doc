@@ -1,0 +1,180 @@
+# digi-carts Platform — TODO Tracker
+
+---
+
+## ✅ DONE
+
+### Repository Migration (dcart-app → digi-carts)
+- [x] All 16 repos created in `digi-carts` org
+- [x] `e2e-tests` excluded (skipped by design)
+- [x] All backend services converted **TypeScript → Java Spring Boot 3.3.0 / Java 21**
+- [x] All frontend repos migrated as-is (Next.js / TypeScript)
+- [x] Name references updated: `dcart` / `ecom` / `dig-cart` → `digi-carts`
+- [x] Domain references updated: `tara-cloud.org` → `digi-carts.com`
+- [x] Old GCP project (`e-com-504518`) references removed
+
+### Branch Strategy
+- [x] `stage` branch created (default) on all repos — dev deployments
+- [x] `main` branch created on all repos — production deployments
+- [x] Both branches pushed to GitHub for all 16 repos
+
+### CI/CD Workflows
+- [x] `deploy-dev.yml` on all repos: push to `stage` → build + deploy to Cloud Run **dev**
+- [x] `deploy-prod.yml` on all repos: push to `main` → auto-tag semver + GitHub Release + deploy Cloud Run **prod**
+- [x] GCP projects separated: `digi-carts-dev` (dev) and `digi-carts` (prod)
+- [x] Auth secrets separated: `GCP_DEV_SA_KEY` (dev) and `GCP_SA_KEY` (prod)
+- [x] Docker images use Artifact Registry: `us-east1-docker.pkg.dev/{project}/digi-cart/digi-cart-{service}`
+
+### Backend Services (Java Spring Boot)
+- [x] `api-gateway` — Spring Cloud Gateway, JWT filter, 12 service routes, CORS
+- [x] `auth-service` — User/Address/PasswordResetToken entities, JWT, Spring Security
+- [x] `notification-service` — NotificationConfig + NotificationLog, email/WhatsApp channels
+- [x] `order-service` — Order/OrderItem/Return/ReturnItem entities, full CRUD
+- [x] `payment-service` — PlatformPaymentConfig/StorePaymentConfig/PaymentOrder/ProcessedWebhook
+- [x] `platform-service` — AdminUser/Subscription/PlatformConfig/SupportTicket
+- [x] `shipping-service` — ShipperConfig/ShippingProviderConfig/Shipment/ReturnShipment/PincodeFallback
+- [x] `store-service` — Store/StorePage entities
+- [x] `storefront-service` — Store read-only resolver
+- [x] `offer-service` — Offer entity (discount codes)
+- [x] `billing-service` — Bill/BillTemplate entities
+- [x] `audit-log-service` — AuditLog/AuditSettings entities
+- [x] `catalog-service` — pre-existing Java service (Product/Category)
+
+### Database
+- [x] Liquibase migrations for all backend services (creates schema + all tables)
+- [x] Hibernate set to `validate` (Liquibase owns schema, not Hibernate DDL)
+- [x] Per-service schemas: `auth_svc`, `catalog_svc`, `order_svc`, etc.
+
+### Frontends
+- [x] `merchant-ui` — migrated, stage + main branches
+- [x] `platform-ui` — migrated, stage + main branches
+- [x] `storefront` — migrated, stage + main branches
+
+### Documentation
+- [x] `doc` repo created
+- [x] `README.md` — full platform overview, architecture, repo table, CI/CD, GCP setup, local dev guide
+- [x] `TODO.md` — this file
+
+---
+
+## ❌ PENDING
+
+### GitHub Org Setup
+- [ ] **Add org-level secrets** (`digi-carts` org → Settings → Secrets):
+  - `GCP_DEV_SA_KEY` — GCP service account JSON for `digi-carts-dev`
+  - `GCP_SA_KEY` — GCP service account JSON for `digi-carts`
+- [ ] **Enable branch protection** on all repos (requires GitHub Pro / Team plan):
+  - `main`: require 1 PR review, block force-push, block deletion
+  - `stage`: block force-push and deletion
+
+### GCP Infrastructure — Dev (`digi-carts-dev`)
+- [ ] Create Artifact Registry repository: `digi-cart` in `us-east1`
+- [ ] Create Cloud Run services (16):
+  `digi-cart-api-gateway-dev`, `digi-cart-auth-service-dev`, `digi-cart-platform-service-dev`, `digi-cart-notification-service-dev`, `digi-cart-catalog-service-dev`, `digi-cart-order-service-dev`, `digi-cart-payment-service-dev`, `digi-cart-shipping-service-dev`, `digi-cart-store-service-dev`, `digi-cart-storefront-service-dev`, `digi-cart-offer-service-dev`, `digi-cart-billing-service-dev`, `digi-cart-audit-log-service-dev`, `digi-cart-merchant-ui-dev`, `digi-cart-platform-ui-dev`, `digi-cart-storefront-dev`
+- [ ] Provision PostgreSQL (Cloud SQL) for dev
+- [ ] Create GCP service account, grant Artifact Registry Writer + Cloud Run Developer roles
+- [ ] Configure IAM for Cloud Run service-to-service calls
+
+### GCP Infrastructure — Prod (`digi-carts`)
+- [ ] Same as dev above (without `-dev` suffix on service names)
+- [ ] Provision PostgreSQL (Cloud SQL) for prod — high availability recommended
+- [ ] Set up Cloud Armor / Load Balancer for custom domain `digi-carts.com`
+
+### Environment Variables per Cloud Run Service
+
+#### All backend services
+| Var | Value |
+|-----|-------|
+| `DATABASE_URL` | `jdbc:postgresql://{host}/{db}?currentSchema={schema}` |
+
+#### `api-gateway`
+| Var | Value |
+|-----|-------|
+| `JWT_SECRET` | strong random secret (same as auth-service) |
+| `AUTH_SERVICE_URL` | internal Cloud Run URL |
+| `CATALOG_SERVICE_URL` | internal Cloud Run URL |
+| `ORDER_SERVICE_URL` | internal Cloud Run URL |
+| `PAYMENT_SERVICE_URL` | internal Cloud Run URL |
+| `PLATFORM_SERVICE_URL` | internal Cloud Run URL |
+| `NOTIFICATION_SERVICE_URL` | internal Cloud Run URL |
+| `SHIPPING_SERVICE_URL` | internal Cloud Run URL |
+| `STORE_SERVICE_URL` | internal Cloud Run URL |
+| `STOREFRONT_SERVICE_URL` | internal Cloud Run URL |
+| `OFFER_SERVICE_URL` | internal Cloud Run URL |
+| `BILLING_SERVICE_URL` | internal Cloud Run URL |
+| `AUDIT_LOG_SERVICE_URL` | internal Cloud Run URL |
+
+#### `auth-service`
+| Var | Value |
+|-----|-------|
+| `JWT_SECRET` | same strong random secret as api-gateway |
+
+#### `payment-service`
+| Var | Value |
+|-----|-------|
+| `RAZORPAY_KEY_ID` | Razorpay API key |
+| `RAZORPAY_KEY_SECRET` | Razorpay secret |
+
+#### `notification-service`
+| Var | Value |
+|-----|-------|
+| Configured at runtime via `/api/notification-config` endpoint | |
+
+#### `shipping-service`
+| Var | Value |
+|-----|-------|
+| Configured at runtime via store shipping config | |
+
+#### `catalog-service`
+| Var | Value |
+|-----|-------|
+| `GCS_BUCKET` | GCS bucket name for product image uploads |
+
+#### `merchant-ui` / `platform-ui` / `storefront`
+| Var | Value |
+|-----|-------|
+| `NEXT_PUBLIC_API_URL` | api-gateway Cloud Run URL |
+| `NEXTAUTH_SECRET` | NextAuth secret |
+| `NEXTAUTH_URL` | App URL |
+
+### Domain & Networking
+- [ ] Set up custom domain `digi-carts.com` → `storefront` Cloud Run service
+- [ ] Set up `app.digi-carts.com` → `merchant-ui` Cloud Run service
+- [ ] Set up `admin.digi-carts.com` → `platform-ui` Cloud Run service
+- [ ] Set up `api.digi-carts.com` → `api-gateway` Cloud Run service
+- [ ] Configure SSL certificates (Google-managed or Let's Encrypt)
+- [ ] Set up store subdomains: `{store}.digi-carts.com` → `storefront` Cloud Run
+
+### Initial Data / Seed
+- [ ] Create default platform subscription plans (via `platform-service`)
+- [ ] Create super-admin user (via `auth-service`)
+- [ ] Create default store template entries
+
+### Post-Migration Verification
+- [ ] Run health checks on all 13 backend services: `GET /health`
+- [ ] Verify Liquibase runs successfully (all schemas and tables created)
+- [ ] Test auth flow: register → login → JWT → api-gateway proxy
+- [ ] Test catalog CRUD via api-gateway
+- [ ] Test order creation flow end-to-end
+- [ ] Verify CI/CD: push to stage → dev deploys; merge to main → release + prod deploys
+- [ ] Verify GitHub Release is auto-created on first merge to main
+
+---
+
+## 📋 Summary
+
+| Category | Done | Pending |
+|----------|------|---------|
+| Repos created | 16 / 16 | 0 |
+| Backend Java services | 13 / 13 | 0 |
+| Frontend repos | 3 / 3 | 0 |
+| CI/CD workflows | 16 / 16 | 0 |
+| Branch setup | 16 / 16 | 0 |
+| Branch protection | 0 / 16 | 16 (needs GitHub Pro) |
+| GCP Artifact Registry | 0 / 2 | 2 |
+| Cloud Run services | 0 / 32 | 32 |
+| PostgreSQL provisioned | 0 / 2 | 2 |
+| GitHub org secrets | 0 / 2 | 2 |
+| Env vars configured | 0 / 16 | 16 |
+| Custom domain setup | 0 / 4 | 4 |
+| Initial seed data | 0 / 1 | 1 |
