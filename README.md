@@ -2,6 +2,18 @@
 
 A multi-tenant e-commerce platform built with Java Spring Boot microservices, Next.js frontends, and deployed on Google Cloud Run.
 
+## Architecture (this repo)
+
+Complete system design lives under [`architecture/`](architecture/):
+
+- [System design](architecture/system-design.md) — context, containers, tenancy, checkout, deploy
+- [Sequence diagrams](architecture/sequence-diagrams.md)
+- [Data model](architecture/data-model.md)
+- [C4 containers](architecture/c4-containers.md)
+- [Service catalog](architecture/service-catalog.md) — links to every project's `doc/README.md`
+
+Per-service and per-UI documentation is maintained in each GitHub repo at **`doc/README.md`**.
+
 ## Repositories
 
 ### Backend Services (Java Spring Boot 3.3.0 / Java 21)
@@ -29,6 +41,13 @@ A multi-tenant e-commerce platform built with Java Spring Boot microservices, Ne
 | [merchant-ui](https://github.com/digi-carts/merchant-ui) | Merchant dashboard (store admin) |
 | [platform-ui](https://github.com/digi-carts/platform-ui) | Super-admin dashboard |
 | [storefront](https://github.com/digi-carts/storefront) | Customer-facing storefront |
+
+### Platform design and per-repo docs
+
+- **[System design](architecture/system-design.md)** — C4-style overview, auth, tenancy, checkout, data ownership, known gaps
+- **[Sequence diagrams](architecture/sequence-diagrams.md)** — JWT, refresh, custom domain, returns
+
+Each service and UI has a full document at `doc/README.md` on the `stage` branch, for example [api-gateway/doc](https://github.com/digi-carts/api-gateway/blob/stage/doc/README.md). The system design file lists every link.
 
 ---
 
