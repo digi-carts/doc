@@ -60,7 +60,8 @@
 - [x] Platform architecture pack: `architecture/system-design.md`, `sequence-diagrams.md`, `c4-containers.md`, `data-model.md`, `service-catalog.md`
 
 ### JavaDoc, health checks, tests
-- [x] JavaDoc (+ `package-info.java`, javadoc plugin) on all 13 Java services
+- [x] JavaDoc on all classes and public methods (`package-info.java`, javadoc plugin) on all 13 Java services
+- [x] REST API pages under each repo `doc/api.md` plus platform catalog `doc/api/`
 - [x] Liveness endpoints `GET /health` and `GET /api/health` on all 12 domain services and `api-gateway` (JWT public paths include both)
 - [x] JUnit 5 unit tests + Cucumber component suites on all Java services (Cucumber excluded from Surefire JaCoCo gate)
 - [x] Cucumber JS component tests on `merchant-ui`, `platform-ui`, `storefront` (`npm run test:component`)

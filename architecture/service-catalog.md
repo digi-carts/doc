@@ -36,3 +36,7 @@ Canonical links to each repository's **`doc/README.md`**. After PRs merge, these
 | Sequences | [architecture/sequence-diagrams.md](./sequence-diagrams.md) |
 | Data model | [architecture/data-model.md](./data-model.md) |
 | C4 | [architecture/c4-containers.md](./c4-containers.md) |
+
+## HTTP APIs
+
+See the generated [HTTP API catalog](../api/README.md).
