@@ -90,7 +90,7 @@ db_url() {
   local CONN_NAME=$1
   local DB=$2
   local SCHEMA=$3
-  echo "jdbc:postgresql:///${DB}?cloudSqlInstance=${CONN_NAME}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=digicart&password=${DB_PASSWORD}&currentSchema=${SCHEMA}"
+  echo "jdbc:postgresql:///${DB}?cloudSqlInstance=${CONN_NAME}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&sslmode=disable&user=digicart&password=${DB_PASSWORD}&currentSchema=${SCHEMA}"
 }
 
 schema_for() {
@@ -100,7 +100,7 @@ schema_for() {
     order-service)        echo "order_svc" ;;
     payment-service)      echo "payment_svc" ;;
     platform-service)     echo "platform_svc" ;;
-    notification-service) echo "notification_svc" ;;
+    notification-service) echo "notif_svc" ;;
     shipping-service)     echo "shipping_svc" ;;
     store-service)        echo "store_svc" ;;
     storefront-service)   echo "storefront_svc" ;;
