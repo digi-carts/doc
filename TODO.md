@@ -54,6 +54,7 @@
 - [x] `doc` repo created
 - [x] `README.md` — full platform overview, architecture, repo table, CI/CD, GCP setup, local dev guide
 - [x] `TODO.md` — this file
+- [x] `scripts/setup-artifact-registry.sh` — GCP Artifact Registry + service account + IAM setup script
 
 ---
 
@@ -68,7 +69,9 @@
   - `stage`: block force-push and deletion
 
 ### GCP Infrastructure — Dev (`digi-carts-dev`)
-- [ ] Create Artifact Registry repository: `digi-cart` in `us-east1`
+
+- [x] Artifact Registry setup script ready → run `doc/scripts/setup-artifact-registry.sh`
+- [ ] **Run** `setup-artifact-registry.sh` (creates `digi-cart` repo, service account, IAM roles, downloads SA key)
 - [ ] Create Cloud Run services (16):
   `digi-cart-api-gateway-dev`, `digi-cart-auth-service-dev`, `digi-cart-platform-service-dev`, `digi-cart-notification-service-dev`, `digi-cart-catalog-service-dev`, `digi-cart-order-service-dev`, `digi-cart-payment-service-dev`, `digi-cart-shipping-service-dev`, `digi-cart-store-service-dev`, `digi-cart-storefront-service-dev`, `digi-cart-offer-service-dev`, `digi-cart-billing-service-dev`, `digi-cart-audit-log-service-dev`, `digi-cart-merchant-ui-dev`, `digi-cart-platform-ui-dev`, `digi-cart-storefront-dev`
 - [ ] Provision PostgreSQL (Cloud SQL) for dev
@@ -171,7 +174,7 @@
 | CI/CD workflows | 16 / 16 | 0 |
 | Branch setup | 16 / 16 | 0 |
 | Branch protection | 0 / 16 | 16 (needs GitHub Pro) |
-| GCP Artifact Registry | 0 / 2 | 2 |
+| GCP Artifact Registry | 1 / 2 (script ready) | run script |
 | Cloud Run services | 0 / 32 | 32 |
 | PostgreSQL provisioned | 0 / 2 | 2 |
 | GitHub org secrets | 0 / 2 | 2 |
