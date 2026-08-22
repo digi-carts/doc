@@ -58,9 +58,22 @@ trap 'kill "$PROXY_PID" 2>/dev/null || true' EXIT
 
 sleep 4
 
+# ─── health-check ───────────────────────────────────────────────────────────
+echo "→ Checking auth-service health..."
+for i in 1 2 3 4 5; do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:13001/health" 2>/dev/null || echo "000")
+  if [ "$STATUS" = "200" ]; then break; fi
+  echo "  waiting for proxy ($i/5)..."
+  sleep 2
+done
+if [ "$STATUS" != "200" ]; then
+  echo "ERROR: auth-service not reachable (status=$STATUS)"
+  exit 1
+fi
+
 # ─── create super-admin ─────────────────────────────────────────────────────
 echo "→ Creating super-admin..."
-RESPONSE=$(curl -sf -X POST "http://localhost:13001/users" \
+HTTP_CODE=$(curl -s -o /tmp/seed_response.json -w "%{http_code}" -X POST "http://localhost:13001/users" \
   -H "Content-Type: application/json" \
   -d "{
     \"email\": \"${ADMIN_EMAIL}\",
@@ -68,10 +81,28 @@ RESPONSE=$(curl -sf -X POST "http://localhost:13001/users" \
     \"name\": \"${ADMIN_NAME}\",
     \"role\": \"superadmin\",
     \"provider\": \"credentials\"
-  }") || {
-  echo "ERROR: request failed — is auth-service healthy?"
+  }")
+
+if [ "$HTTP_CODE" = "201" ]; then
+  RESPONSE=$(cat /tmp/seed_response.json)
+elif [ "$HTTP_CODE" = "409" ] || (grep -qi "already exists\|duplicate\|unique" /tmp/seed_response.json 2>/dev/null); then
+  echo "INFO: user ${ADMIN_EMAIL} already exists — updating role to superadmin..."
+  USER_ID=$(curl -s "http://localhost:13001/users/email/${ADMIN_EMAIL}" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+  if [ -n "$USER_ID" ]; then
+    curl -s -X PATCH "http://localhost:13001/users/${USER_ID}" \
+      -H "Content-Type: application/json" \
+      -d '{"role":"superadmin"}' > /dev/null
+    RESPONSE="{\"email\":\"${ADMIN_EMAIL}\"}"
+  else
+    echo "ERROR: could not fetch existing user. Response:"
+    cat /tmp/seed_response.json
+    exit 1
+  fi
+else
+  echo "ERROR: request failed (HTTP $HTTP_CODE). Response:"
+  cat /tmp/seed_response.json
   exit 1
-}
+fi
 
 echo ""
 echo "══════════════════════════════════════════════════"
